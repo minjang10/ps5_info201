@@ -4,22 +4,83 @@ output: html_document
 date: "2023-02-18"
 ---
 
-``` {r, error = FALSE, results="asis"}
-library('tidyverse')
-cntry <- read_tsv("../Data/gapminder.csv")
+# 1. Load and check data
 
+``` {r, results="asis"}
+library('tidyverse')
+cntry <- read_delim("../Data/gapminder.csv")
+```
+
+2. (2pt) Load data. How many rows/columns do we have?
+
+``` {r}
 dim <- dim(cntry)
 cat("there are", dim, "rows and columns, respectively")
 knitr::kable(head(cntry))
 ```
 
+# 2 Descriptive statistics
+
+1. (3pt) How many countries are there in the dataset?
+
 There are `r length(unique(cntry$name))` names of countries.
 There are `r length(unique(cntry$iso2))` iso2 codes.
 There are `r length(unique(cntry$iso3))` iso3 codes.
 
-There seems to be more iso3 codes than country names and more country names than iso2 codes.
+2. If you did this correctly, you saw that there are more names than iso-2 codes, and there are
+even more iso3 -codes. What is going on? Can you find it out?
 
 ``` {r}
+group_by(cntry, iso2) %>% 
+  summarize(
+    n = length(unique(name))
+  ) %>% 
+  filter(n > 1)
 
+cat("There are two country names that do not have iso2 codes")
+
+group_by(cntry, name) %>% 
+  summarize(
+    n = length(unique(iso3))
+  ) %>% 
+  filter(n > 1)
+
+cntry[is.na(cntry$name),] %>% 
+  group_by(iso3) %>% 
+  summarize(
+    n = n()
+  )
+
+cat("There are 4 unnamed countries with an iso3 code")
+cat("These entities are CHANISL, GBM, KOS, and NLD_CURACAO")
+
+```
+
+3. (2pt) What is the minimum and maximum year in these data?
+
+``` {r}
+min(cntry[is.na(cntry$name),]$time)
+max(cntry[is.na(cntry$name),]$time)
+```
+
+# 3 CO2 emissions 
+
+1. (2pt) How many missing co2 emissions are there for each year? Analyze both missing CO2
+and co2_PC. Which years have most missing data?
+```{r}
+mssng <- group_by(cntry[is.na(cntry$co2) | is.na(cntry$co2_PC),], time) %>% 
+  summarize(
+    n = n()
+  ) %>% 
+  arrange(n)
+head(mssng)
+
+cat("2012, 2013, 2014 have the most missing data")
+
+```
+2. (5pt) Make a plot of total CO2 emissions over time for the U.S, China, and India. Add a few
+more countries of your choice. Explain what do you see.
+```{r}
+plot <- cntry[cntry$name == "United States of America" | cntry$name == "China" | cntry$name == "India", ]
 
 ```
