@@ -301,3 +301,7 @@ relative ranks divided by corresponding number of countries:
 1960: `r usrank60/length(unique(le60$name))`
 
 2019: `r usrank19/length(unique(le19$name))`
+
+# Finally tell us how many hours did you spend on this PS.
+
+This PS took me about 6 hours.
